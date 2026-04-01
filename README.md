@@ -1,5 +1,5 @@
 # *Polyglot-Nexus*
-## **Architect: Ben Mahmoud**
+## **<ins>Architect:</ins> Ben Mahmoud**
 
 ### *Multilingual Semantic Logic Adapter for Computer Science Education*
 
