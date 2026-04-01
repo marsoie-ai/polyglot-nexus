@@ -1,4 +1,4 @@
-### *Polyglot-Nexus*
+### *Polyglot-Nexus*            ######**Architect: Ben Mahmoud**
 
 ### *Multilingual Semantic Logic Adapter for Computer Science Education*
 
@@ -21,8 +21,6 @@ This was developed to solve the "Linguistic Logic Gap" thus ensuring students un
 
 **🏫 Polyglot-Nexus: Semantic Logic Adapter**
 
-**Architect:** Ben Mahmoud
-
 **Target:** Cambridge International Education (CIE) CS Curriculum
 
 **🎯 Project Vision**
@@ -31,7 +29,7 @@ Polyglot-Nexus is a high-fidelity educational tool designed to bridge the gap be
 
 **🛠️ Engineering Highlights**
 
-    **1) Dynamic Semantic Mapping:** Orchestrated system prompts to maintain academic rigor while adjusting cognitive load for Primary through A Level pathways.
-    **2) RTL Rendering Engine:** Implemented arabic_reshaper and python-bidi within an xhtml2pdf pipeline to solve complex Right-to-Left (RTL) typesetting challenges in PDF generation.
-    **3) Interactive Analytics:** Developed a real-time dashboard to visualize lesson depth and linguistic framework verification.
-    **4) Prompt Engineering:** Demonstrated advanced LLM control through weighted constraint logic.
+    **1) Dynamic Semantic Mapping: Orchestrated system prompts to maintain academic rigor while adjusting cognitive load for Primary through A Level pathways.**
+    **2) RTL Rendering Engine: Implemented arabic_reshaper and python-bidi within an xhtml2pdf pipeline to solve complex Right-to-Left (RTL) typesetting challenges in PDF generation.**
+    **3) Interactive Analytics: Developed a real-time dashboard to visualize lesson depth and linguistic framework verification.**
+    **4) Prompt Engineering: Demonstrated advanced LLM control through weighted constraint logic.**
