@@ -1,3 +1,5 @@
-groq
-python-dotenv
 streamlit
+xhtml2pdf
+arabic-reshaper
+python-bidi
+groq
