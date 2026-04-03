@@ -5,6 +5,15 @@ from xhtml2pdf import pisa
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 import io
+import os
+from supabase import create_client, Client
+
+# Fetch secrets from Hugging Face environment
+url = os.environ.get("SUPABASE_URL")
+key = os.environ.get("SUPABASE_KEY")
+
+# Initialize the Supabase client
+supabase: Client = create_client(url, key)
 
 # --- CORE LOGIC: PDF GENERATION ---
 def create_pdf_bytes(raw_text):
