@@ -90,56 +90,53 @@ def main():
     with col2:
         topic = st.text_input("Computer Science Topic:", placeholder="e.g. Logic Gates")
 
-if st.button("Generate Cultural Logic", use_container_width=True):
+    # --- BUTTON LOGIC (Now correctly indented inside main) ---
+    if st.button("Generate Cultural Logic", use_container_width=True):
         if topic:
             with st.spinner("Executing Semantic Mapping..."):
                 try:
-                    # 1. Generate the content (ONLY ONCE)
+                    # 1. Generate the content
                     response = polyglot_nexus_engine(topic, level)
                     
-                    # 2. SAVE TO DATABASE (Now properly indented under 'try')
+                    # 2. Save to database
                     save_lesson_to_db(topic, level, response)
                     
-                    # 3. Show Success
+                    # 3. Process PDF
+                    pdf_bytes = create_pdf_bytes(response)
+
+                    # 4. Success UI
                     st.success("✅ Lesson archived to Supabase.")
 
-                except Exception as e:
-                    st.error(f"❌ Database Sync Error: {e}")
-                    
-                if show_advanced:
-                    st.markdown("### 📊 Lesson Analytics")
-                    m1, m2, m3 = st.columns(3)
-                    depth_score = {"Primary": "Core", "Lower Secondary": "Intermediate", "IGCSE": "Advanced", "A Level": "Expert"}
-                    m1.metric("Cognitive Depth", depth_score[level])
-                    m2.metric("Linguistic Frameworks", "7 Languages", "Verified")
-                    m3.metric("PDF Encoding", "UTF-8", "RTL Active")
-                    st.divider()
-                    
-                    with st.expander("🛠️ View Semantic Mapping Prompt"):
-                        system_prompt = f"""
-                        You are a Cambridge CS Expert. 
-                        Task: Adapt '{topic}' for the '{level}' pathway.
-                        """
-                        st.code(system_prompt, language="markdown")
-                    
-                    st.divider()
-                    st.download_button("📥 Download Lesson Notes (PDF)", 
-                                       pdf_bytes, f"{topic}_{level}_Notes.pdf", "application/pdf")
-                    
-                    languages = ["ENGLISH", "DEUTSCH", "FRANÇAIS", "ITALIANO", "ESPAÑOL", "العربية", "MALTI"]
-                    for lang in languages:
-                        with st.expander(f"⬜ {lang} Perspective"):
-                            search_tag = f"### {lang}"
-                            if search_tag in response:
-                                content = response.split(search_tag)[1].split("###")[0]
-                                st.markdown(content.strip())
+                    if show_advanced:
+                        st.markdown("### 📊 Lesson Analytics")
+                        m1, m2, m3 = st.columns(3)
+                        depth_score = {"Primary": "Core", "Lower Secondary": "Intermediate", "IGCSE": "Advanced", "A Level": "Expert"}
+                        m1.metric("Cognitive Depth", depth_score[level])
+                        m2.metric("Linguistic Frameworks", "7 Languages", "Verified")
+                        m3.metric("PDF Encoding", "UTF-8", "RTL Active")
+                        st.divider()
+                        
+                        with st.expander("🛠️ View Semantic Mapping Prompt"):
+                            system_prompt = f"You are a Cambridge CS Expert. Task: Adapt '{topic}' for the '{level}' pathway."
+                            st.code(system_prompt, language="markdown")
+                        
+                        st.divider()
+                        st.download_button("📥 Download Lesson Notes (PDF)", 
+                                         pdf_bytes, f"{topic}_{level}_Notes.pdf", "application/pdf")
+                        
+                        languages = ["ENGLISH", "DEUTSCH", "FRANÇAIS", "ITALIANO", "ESPAÑOL", "العربية", "MALTI"]
+                        for lang in languages:
+                            with st.expander(f"⬜ {lang} Perspective"):
+                                search_tag = f"### {lang}"
+                                if search_tag in response:
+                                    content = response.split(search_tag)[1].split("###")[0]
+                                    st.markdown(content.strip())
 
-                    st.success("✅ Adaptation complete and archived to database.")
-                    
                 except Exception as e:
-                    st.error(f"System Error: {e}")
+                    st.error(f"❌ System Error: {e}")
         else:
             st.warning("Input required: Please enter a topic to begin.")
 
+# --- EXECUTION ---
 if __name__ == "__main__":
     main()
