@@ -20,14 +20,14 @@ def save_lesson_to_db(topic, language, content):
     try:
         data = {
             "topic": topic,
-            "language": language,
+            "language": language, # Fixed: uses the parameter name from line 18
             "content": content
         }
         # Attempt to insert into your 'lessons' table
         response = supabase.table("lessons").insert(data).execute()
         return response
     except Exception as e:
-        # This will now create a VISIBLE red box on your Streamlit UI
+        # This creates a VISIBLE red box on your Streamlit UI if it fails
         st.error(f"⚠️ Database Sync Failed: {e}")
         return None
 
