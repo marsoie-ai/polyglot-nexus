@@ -90,26 +90,29 @@ def main():
     with col2:
         topic = st.text_input("Computer Science Topic:", placeholder="e.g. Logic Gates")
 
-    if st.button("Generate Cultural Logic", use_container_width=True):
+if st.button("Generate Cultural Logic", use_container_width=True):
         if topic:
             with st.spinner("Executing Semantic Mapping..."):
                 try:
-                    # 1. Generate the content
+                    # 1. Generate the content (ONLY ONCE)
                     response = polyglot_nexus_engine(topic, level)
                     
-                    # 1. Generate the content
-                    response = polyglot_nexus_engine(topic, level)
-
-                    # 2. SAVE TO DATABASE (Handing 'level' to the 'language' column)
+                    # 2. SAVE TO DATABASE (Now properly indented under 'try')
                     save_lesson_to_db(topic, level, response)
                     
-                    if show_advanced:
-                        st.markdown("### 📊 Lesson Analytics")
-                        m1, m2, m3 = st.columns(3)
-                        depth_score = {"Primary": "Core", "Lower Secondary": "Intermediate", "IGCSE": "Advanced", "A Level": "Expert"}
-                        m1.metric("Cognitive Depth", depth_score[level])
-                        m2.metric("Linguistic Frameworks", "7 Languages", "Verified")
-                        m3.metric("PDF Encoding", "UTF-8", "RTL Active")
+                    # 3. Show Success
+                    st.success("✅ Lesson archived to Supabase.")
+
+                except Exception as e:
+                    st.error(f"❌ Database Sync Error: {e}")
+                    
+                if show_advanced:
+                    st.markdown("### 📊 Lesson Analytics")
+                    m1, m2, m3 = st.columns(3)
+                    depth_score = {"Primary": "Core", "Lower Secondary": "Intermediate", "IGCSE": "Advanced", "A Level": "Expert"}
+                    m1.metric("Cognitive Depth", depth_score[level])
+                    m2.metric("Linguistic Frameworks", "7 Languages", "Verified")
+                    m3.metric("PDF Encoding", "UTF-8", "RTL Active")
                     st.divider()
                     
                     with st.expander("🛠️ View Semantic Mapping Prompt"):
