@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: Python Package
 
 on: [push]
 
@@ -11,15 +11,16 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcairo2
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pytest streamlit xhtml2pdf arabic-reshaper python-bidi groq
     - name: Test with pytest
       run: |
-        pytest test_app.py
-    - name: Test with pytest
-      run: |
-        pytest test_app.py
+        python -m pytest test_app.py
       env:
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
