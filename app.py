@@ -16,17 +16,19 @@ supabase: Client = create_client(url, key)
 
 # --- DATABASE LOGIC ---
 def save_lesson_to_db(topic, language, content):
-    """Inserts generated lesson data into the Supabase 'lessons' table."""
+    """Inserts generated lesson data into the Supabase 'lessons' table with error reporting."""
     try:
         data = {
             "topic": topic,
             "language": language,
             "content": content
         }
+        # Attempt to insert into your 'lessons' table
         response = supabase.table("lessons").insert(data).execute()
         return response
     except Exception as e:
-        st.error(f"Database Error: {e}")
+        # This will now create a VISIBLE red box on your Streamlit UI
+        st.error(f"⚠️ Database Sync Failed: {e}")
         return None
 
 # --- CORE LOGIC: PDF GENERATION ---
@@ -95,11 +97,11 @@ def main():
                     # 1. Generate the content
                     response = polyglot_nexus_engine(topic, level)
                     
-                    # 2. SAVE TO DATABASE (The new trigger!)
+                    # 1. Generate the content
+                    response = polyglot_nexus_engine(topic, level)
+
+                    # 2. SAVE TO DATABASE (Handing 'level' to the 'language' column)
                     save_lesson_to_db(topic, level, response)
-                    
-                    # 3. Create PDF
-                    pdf_bytes = create_pdf_bytes(response)
                     
                     if show_advanced:
                         st.markdown("### 📊 Lesson Analytics")
