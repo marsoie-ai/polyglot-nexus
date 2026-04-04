@@ -96,20 +96,19 @@ def main():
             with st.spinner("Executing Semantic Mapping..."):
                 try:
                     # 1. Generate the content
-                    response = polyglot_nexus_engine(topic, level)
+                    lesson_content = polyglot_nexus_engine(topic, level)
                     
-                    # 2. Save to database - Now properly indented inside the try block
-                    # We force response to str() to match Supabase 'text' column
-                    db_status = save_lesson_to_db(topic, level, str(response))
+                    # 2. Save to database - USE THE NEW VARIABLE NAME
+                    db_status = save_lesson_to_db(topic, level, str(lesson_content))
 
                     # 3. Process PDF
-                    pdf_bytes = create_pdf_bytes(response)
+                    pdf_bytes = create_pdf_bytes(lesson_content)
 
-                    # 4. Success UI - Only shows if db_status is NOT None
+                    # 4. Success UI
                     if db_status:
                         st.success("✅ Lesson archived to Supabase.")
                     else:
-                        st.warning("⚠️ Content generated, but failed to sync with Supabase.")
+                        st.warning("⚠️ Content generated, but failed to sync.")
 
                     if show_advanced:
                         st.markdown("### 📊 Lesson Analytics")
