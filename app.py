@@ -5,7 +5,8 @@ from xhtml2pdf import pisa
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 import io
-from supabase import create_client, Client
+from supabase import create_client, Client  # <--- OLD IMPORT DB1
+from convex import ConvexClient  # <--- NEW IMPORT DB2
 
 # Fetch secrets from Hugging Face environment
 url = os.environ.get("SUPABASE_URL")
@@ -13,22 +14,39 @@ key = os.environ.get("SUPABASE_KEY")
 
 # Initialize the Supabase client
 supabase: Client = create_client(url, key)
+# New Convex Init
+convex_url = os.environ.get("CONVEX_URL")
+convex_client = ConvexClient(https://adorable-perch-400.convex.cloud)
 
-# --- DATABASE LOGIC ---
-def save_lesson_to_db(topic, level, content): # Changed parameter name to 'level'
-    """Inserts generated lesson data into the Supabase 'lessons' table."""
+# --- DATABASE LOGIC (NEW) ---
+def save_lesson_to_db(topic, level, content):
+    data = {
+        "topic": topic,
+        "level": level,
+        "content": content
+    }
+    
+    success = False
+
+    # 1. Attempt Supabase
     try:
-        data = {
-            "topic": topic,
-            "level": level,    # SUCCESS: This now matches your Supabase column name
-            "content": content
-        }
-        # Attempt to insert into your 'lessons' table
-        response = supabase.table("lessons").insert(data).execute()
-        return response
+        supabase.table("lessons").insert(data).execute()
+        st.success("✅ Archived to Supabase")
+        success = True
     except Exception as e:
-        st.error(f"⚠️ Database Sync Failed: {e}")
-        return None
+        st.error(f"❌ Supabase Error: {e}")
+
+    # 2. Attempt Convex
+    try:
+        # 'lessons' is the table name, 'insert' is a common internal name for mutations
+        convex_client.mutation("lessons:insert", data) 
+        st.success("✅ Archived to Convex")
+        success = True
+    except Exception as e:
+        # We use info here so it doesn't look like a "total" failure if Supabase worked
+        st.info(f"💡 Convex Note: {e}") 
+
+    return success
 
 # --- CORE LOGIC: PDF GENERATION ---
 def create_pdf_bytes(raw_text):
