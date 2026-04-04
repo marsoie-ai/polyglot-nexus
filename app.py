@@ -16,7 +16,7 @@ key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 # New Convex Init
 convex_url = os.environ.get("CONVEX_URL")
-convex_client = ConvexClient(https://adorable-perch-400.convex.cloud)
+convex_client = ConvexClient(convex_url)
 
 # --- DATABASE LOGIC (NEW) ---
 def save_lesson_to_db(topic, level, content):
