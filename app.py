@@ -67,7 +67,6 @@ def create_pdf_bytes(raw_text):
     pisa.CreatePDF(io.BytesIO(html_template.encode("UTF-8")), dest=result)
     return result.getvalue()
 
-# --- REFINED PORTFOLIO UI ---
 def main():
     st.set_page_config(page_title="ISW Polyglot-Nexus", page_icon="🏫", layout="wide")
 
@@ -98,7 +97,7 @@ def main():
                     # 1. Generate the content
                     lesson_content = polyglot_nexus_engine(topic, level)
                     
-                    # 2. Save to database - USE THE NEW VARIABLE NAME
+                    # 2. Save to database
                     db_status = save_lesson_to_db(topic, level, str(lesson_content))
 
                     # 3. Process PDF
@@ -108,7 +107,12 @@ def main():
                     if db_status:
                         st.success("✅ Lesson archived to Supabase.")
                     else:
-                        st.warning("⚠️ Content generated, but failed to sync.")
+                        st.warning("⚠️ Content generated, but failed to sync with Supabase.")
+
+                    # --- ALWAYS VISIBLE DOWNLOAD ---
+                    st.download_button("📥 Download Lesson Notes (PDF)", 
+                                     pdf_bytes, f"{topic}_{level}_Notes.pdf", "application/pdf")
+                    st.divider()
 
                     if show_advanced:
                         st.markdown("### 📊 Lesson Analytics")
@@ -123,19 +127,20 @@ def main():
                             system_prompt = f"You are a Cambridge CS Expert. Task: Adapt '{topic}' for the '{level}' pathway."
                             st.code(system_prompt, language="markdown")
                         
-                        st.divider()
-                        st.download_button("📥 Download Lesson Notes (PDF)", 
-                                         pdf_bytes, f"{topic}_{level}_Notes.pdf", "application/pdf")
-                        
-                        languages = ["ENGLISH", "DEUTSCH", "FRANÇAIS", "ITALIANO", "ESPAÑOL", "العربية", "MALTI"]
-                        for lang in languages:
-                            with st.expander(f"⬜ {lang} Perspective"):
-                                search_tag = f"### {lang}"
-                                if search_tag in response:
-                                    content = response.split(search_tag)[1].split("###")[0]
-                                    st.markdown(content.strip())
+                    # --- TRANSLATION DISPLAY ---
+                    languages = ["ENGLISH", "DEUTSCH", "FRANÇAIS", "ITALIANO", "ESPAÑOL", "العربية", "MALTI"]
+                    for lang in languages:
+                        with st.expander(f"⬜ {lang} Perspective"):
+                            search_tag = f"### {lang}"
+                            # CRITICAL FIX: Changed 'response' to 'lesson_content'
+                            if search_tag in lesson_content:
+                                content = lesson_content.split(search_tag)[1].split("###")[0]
+                                st.markdown(content.strip())
 
                 except Exception as e:
                     st.error(f"❌ System Error: {e}")
         else:
             st.warning("Input required: Please enter a topic to begin.")
+
+if __name__ == "__main__":
+    main()
