@@ -6,10 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      
+      - uses: actions/checkout@v4 # Updated to v4 to fix the Node.js warning
+
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5 # Updated to v5 to fix the Node.js warning
         with:
           python-version: "3.10"
 
@@ -21,8 +21,8 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest streamlit arabic-reshaper python-bidi groq supabase
-          pip install pycairo xhtml2pdf
+          pip install pytest
+          pip install -r requirements.txt # This installs convex, supabase, and everything else automatically
 
       - name: Test with pytest
         run: |
@@ -31,3 +31,4 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          CONVEX_URL: ${{ secrets.CONVEX_URL }} # Added this so your tests can see Convex
