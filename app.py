@@ -5,20 +5,32 @@ from xhtml2pdf import pisa
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 import io
-from supabase import create_client, Client  # <--- OLD IMPORT DB1
-from convex import ConvexClient  # <--- NEW IMPORT DB2
+from supabase import create_client, Client
+from convex import ConvexClient
 
 # Fetch secrets from Hugging Face environment
 url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
-
-# Initialize the Supabase client
-supabase: Client = create_client(url, key)
-# New Convex Init
 convex_url = os.environ.get("CONVEX_URL")
-convex_client = ConvexClient(convex_url)
 
-# --- DATABASE LOGIC (NEW) ---
+# Initialize Supabase Safely
+supabase = None
+if url and key:
+    try:
+        supabase = create_client(url, key)
+    except Exception:
+        supabase = None
+
+# Initialize Convex Safely
+convex_client = None
+if convex_url:
+    try:
+        # Use the variable, not a hardcoded string
+        convex_client = ConvexClient(convex_url)
+    except Exception:
+        convex_client = None
+
+# --- DATABASE LOGIC (ULTRA-PRO DUAL SYNC) ---
 def save_lesson_to_db(topic, level, content):
     data = {
         "topic": topic,
@@ -26,27 +38,30 @@ def save_lesson_to_db(topic, level, content):
         "content": content
     }
     
-    success = False
+    supabase_success = False
+    convex_success = False
 
     # 1. Attempt Supabase
-    try:
-        supabase.table("lessons").insert(data).execute()
-        st.success("✅ Archived to Supabase")
-        success = True
-    except Exception as e:
-        st.error(f"❌ Supabase Error: {e}")
+    if supabase:
+        try:
+            supabase.table("lessons").insert(data).execute()
+            st.success("✅ Archived to Supabase")
+            supabase_success = True
+        except Exception as e:
+            st.error(f"❌ Supabase Sync Failed: {e}")
 
     # 2. Attempt Convex
-    try:
-        # 'lessons' is the table name, 'insert' is a common internal name for mutations
-        convex_client.mutation("lessons:insert", data) 
-        st.success("✅ Archived to Convex")
-        success = True
-    except Exception as e:
-        # We use info here so it doesn't look like a "total" failure if Supabase worked
-        st.info(f"💡 Convex Note: {e}") 
+    if convex_client:
+        try:
+            # This sends data to the 'lessons' table via an 'insert' function
+            convex_client.mutation("lessons:insert", data) 
+            st.success("✅ Archived to Convex")
+            convex_success = True
+        except Exception as e:
+            st.info(f"💡 Convex Note: {e}") 
 
-    return success
+    # Return True if at least one database caught the data
+    return supabase_success or convex_success
 
 # --- CORE LOGIC: PDF GENERATION ---
 def create_pdf_bytes(raw_text):
