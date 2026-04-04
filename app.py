@@ -90,7 +90,7 @@ def main():
     with col2:
         topic = st.text_input("Computer Science Topic:", placeholder="e.g. Logic Gates")
 
-    # --- BUTTON LOGIC (Now correctly indented inside main) ---
+    # --- BUTTON LOGIC ---
     if st.button("Generate Cultural Logic", use_container_width=True):
         if topic:
             with st.spinner("Executing Semantic Mapping..."):
@@ -98,14 +98,18 @@ def main():
                     # 1. Generate the content
                     response = polyglot_nexus_engine(topic, level)
                     
-                    # 2. Save to database
-                    save_lesson_to_db(topic, level, response)
-                    
+                    # 2. Save to database - Now properly indented inside the try block
+                    # We force response to str() to match Supabase 'text' column
+                    db_status = save_lesson_to_db(topic, level, str(response))
+
                     # 3. Process PDF
                     pdf_bytes = create_pdf_bytes(response)
 
-                    # 4. Success UI
-                    st.success("✅ Lesson archived to Supabase.")
+                    # 4. Success UI - Only shows if db_status is NOT None
+                    if db_status:
+                        st.success("✅ Lesson archived to Supabase.")
+                    else:
+                        st.warning("⚠️ Content generated, but failed to sync with Supabase.")
 
                     if show_advanced:
                         st.markdown("### 📊 Lesson Analytics")
@@ -136,7 +140,3 @@ def main():
                     st.error(f"❌ System Error: {e}")
         else:
             st.warning("Input required: Please enter a topic to begin.")
-
-# --- EXECUTION ---
-if __name__ == "__main__":
-    main()
