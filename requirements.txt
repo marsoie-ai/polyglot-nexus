@@ -3,4 +3,5 @@ xhtml2pdf
 arabic-reshaper
 python-bidi
 groq
+convex
 supabase
