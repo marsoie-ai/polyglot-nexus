@@ -15,19 +15,18 @@ key = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 # --- DATABASE LOGIC ---
-def save_lesson_to_db(topic, language, content):
-    """Inserts generated lesson data into the Supabase 'lessons' table with error reporting."""
+def save_lesson_to_db(topic, level, content): # Changed parameter name to 'level'
+    """Inserts generated lesson data into the Supabase 'lessons' table."""
     try:
         data = {
             "topic": topic,
-            "language": language, # Fixed: uses the parameter name from line 18
+            "level": level,    # SUCCESS: This now matches your Supabase column name
             "content": content
         }
         # Attempt to insert into your 'lessons' table
         response = supabase.table("lessons").insert(data).execute()
         return response
     except Exception as e:
-        # This creates a VISIBLE red box on your Streamlit UI if it fails
         st.error(f"⚠️ Database Sync Failed: {e}")
         return None
 
@@ -132,8 +131,8 @@ def main():
                     for lang in languages:
                         with st.expander(f"⬜ {lang} Perspective"):
                             search_tag = f"### {lang}"
-                            # CRITICAL FIX: Changed 'response' to 'lesson_content'
                             if search_tag in lesson_content:
+                                # This splits by the language name and takes the text before the next ###
                                 content = lesson_content.split(search_tag)[1].split("###")[0]
                                 st.markdown(content.strip())
 
