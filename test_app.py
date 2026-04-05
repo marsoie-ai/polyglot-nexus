@@ -1,5 +1,5 @@
 import pytest
-from app import create_pdf_bytes
+from streamlit_app import create_pdf_bytes
 
 def test_language_splitting_logic():
     """Ensures the engine correctly identifies and splits language headers."""
