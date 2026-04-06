@@ -5,6 +5,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # This tells GitHub to run all commands inside the convex directory
+    defaults:
+      run:
+        working-directory: ./convex
     steps:
       - uses: actions/checkout@v4
       
@@ -17,7 +21,6 @@ jobs:
         run: npm install
         
       - name: Deploy to Convex
-        # No flags needed! The secret key handles the "where"
         run: npx convex deploy
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
