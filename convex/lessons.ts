@@ -1,18 +1,17 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
-// This is the "Worker" that Supabase already has, but Convex was missing.
 export const insert = mutation({
   args: {
-    topic: v.string(),
-    level: v.string(),
-    content: v.string(),
+    title: v.string(),
+    cultural_logic: v.string(), // Define the type here
   },
   handler: async (ctx, args) => {
+    // Now TypeScript knows args.cultural_logic exists!
     const lessonId = await ctx.db.insert("lessons", {
-      topic: args.topic,
-      level: args.level,
-      content: args.content,
+      title: args.title,
+      cultural_logic: args.cultural_logic,
+      content: {}, 
     });
     return lessonId;
   },
