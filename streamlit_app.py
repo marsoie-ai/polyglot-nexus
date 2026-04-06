@@ -13,6 +13,7 @@ url = os.environ.get("SUPABASE_URL")
 key = os.environ.get("SUPABASE_KEY")
 convex_url = os.environ.get("CONVEX_URL")
 
+# Initialize Supabase
 supabase = None
 if url and key:
     try:
@@ -20,35 +21,41 @@ if url and key:
     except:
         supabase = None
 
+# Initialize Convex
 convex_client = None
 if convex_url:
     try:
-        convex_client.mutation("lessons:createLesson", {
-    "title": title,
-    "cultural_logic": cultural_logic,
-    "content": content
-})
+        # FIXED: Removed the 'mutation' call from here. 
+        # You can't run a mutation during initialization because 'title/content' don't exist yet.
+        convex_client = ConvexClient(convex_url) 
     except:
         convex_client = None
 
 def save_lesson_to_db(topic, level, content):
-    """Syncs data to Supabase and Convex simultaneously."""
+    """Syncs data with granular status tracking."""
     data = {"topic": topic, "level": level, "content": str(content)}
     s_ok, c_ok = False, False
     
+    # 1. Attempt Supabase Sync
     if supabase:
         try:
             supabase.table("lessons").insert(data).execute()
             s_ok = True
         except Exception as e:
-            st.error(f"Supabase Error: {e}")
+            st.sidebar.error(f"Supabase Sync Error: {e}")
             
+    # 2. Attempt Convex Sync
     if convex_client:
         try:
-            convex_client.mutation("lessons:insert", data)
+            # FIXED: Changed 'lessons:insert' to 'lessons:createLesson' to match your schema
+            convex_client.mutation("lessons:createLesson", {
+                "title": topic,
+                "cultural_logic": level,
+                "content": str(content)
+            })
             c_ok = True
         except Exception as e:
-            st.info(f"Convex Note: {e}")
+            st.sidebar.warning(f"Convex Sync Note: {e}")
             
     return s_ok, c_ok
 
@@ -92,16 +99,19 @@ def main():
                     # 1. AI Generation
                     lesson_content = polyglot_nexus_engine(topic, level)
                     
-                    # 2. PRO CLOUD SYNC (The Fix)
+                    # 2. TRAFFIC LIGHT CLOUD SYNC
                     with st.status("Initiating Dual-Database Sync...", expanded=True) as status:
                         st.write("Handshaking with Supabase & Convex...")
                         s_ok, c_ok = save_lesson_to_db(topic, level, lesson_content)
+                        
                         if s_ok and c_ok:
-                            status.update(label="✅ All Databases Synchronized", state="complete")
-                        elif s_ok or c_ok:
-                            status.update(label="⚠️ Partial Sync (Check Logs)", state="complete")
+                            status.update(label="✅ Full Success: Supabase & Convex Synced", state="complete")
+                        elif s_ok and not c_ok:
+                            status.update(label="⚠️ Partial Success: Saved to Supabase (Convex Failed)", state="complete")
+                        elif c_ok and not s_ok:
+                            status.update(label="⚠️ Partial Success: Saved to Convex (Supabase Failed)", state="complete")
                         else:
-                            status.update(label="❌ Sync Failed", state="error")
+                            status.update(label="❌ Sync Failed: Both Databases Offline", state="error")
 
                     # 3. PDF Preparation
                     pdf_bytes = create_pdf_bytes(str(lesson_content))
@@ -120,8 +130,8 @@ def main():
                         with st.expander(f"⬜ {lang} Perspective"):
                             search_tag = f"### {lang}"
                             if search_tag in str(lesson_content):
-                                content = str(lesson_content).split(search_tag)[1].split("###")[0]
-                                st.markdown(content.strip())
+                                content_slice = str(lesson_content).split(search_tag)[1].split("###")[0]
+                                st.markdown(content_slice.strip())
 
                 except Exception as e:
                     st.error(f"❌ System Error: {e}")
