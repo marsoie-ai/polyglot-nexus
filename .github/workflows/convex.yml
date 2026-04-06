@@ -11,12 +11,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # The magic number fix
+          node-version: '20'
           
       - name: Install dependencies
         run: npm install
         
       - name: Deploy to Convex
-        run: npx convex deploy --prod
+        # Changed --prod to --production
+        run: npx convex deploy --production 
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
