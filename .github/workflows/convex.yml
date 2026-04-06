@@ -8,11 +8,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # This is the missing piece that tells GitHub to use Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20' # The magic number fix
           
       - name: Install dependencies
         run: npm install
