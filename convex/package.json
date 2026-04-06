@@ -1,8 +1,4 @@
 {
   "dependencies": {
     "convex": "^1.11.0"
-  },
-  "scripts": {
-    "deploy": "convex deploy"
   }
-}
