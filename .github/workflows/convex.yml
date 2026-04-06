@@ -19,7 +19,7 @@ jobs:
         working-directory: ./convex
 
       - name: Generate Convex files
-        run: npx convex codegen --prefix convex
+        run: npx convex codegen
         working-directory: ./convex
 
       - name: Deploy to Convex
