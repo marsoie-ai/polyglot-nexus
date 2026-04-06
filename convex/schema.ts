@@ -3,8 +3,8 @@ import { v } from "convex/values";
 
 export default defineSchema({
   lessons: defineTable({
-    topic: v.string(),
-    level: v.string(),
-    content: v.string(),
+    title: v.string(),
+    cultural_logic: v.string(), // Add this line
+    content: v.any(), 
   }),
 });
