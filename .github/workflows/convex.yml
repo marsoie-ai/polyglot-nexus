@@ -14,7 +14,6 @@ jobs:
           node-version: '20'
           
       - name: Install dependencies
-        # This "working-directory" is the magic fix
         run: npm install
         working-directory: ./convex
         
