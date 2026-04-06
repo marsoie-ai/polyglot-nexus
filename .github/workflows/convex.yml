@@ -19,7 +19,7 @@ jobs:
         working-directory: ./convex
         
       - name: Deploy to Convex
-        run: npx convex deploy
+        run: npm run deploy
         working-directory: ./convex
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
