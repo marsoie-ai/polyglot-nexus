@@ -23,7 +23,11 @@ if url and key:
 convex_client = None
 if convex_url:
     try:
-        convex_client = ConvexClient(convex_url)
+        convex_client.mutation("lessons:createLesson", {
+    "title": title,
+    "cultural_logic": cultural_logic,
+    "content": content
+})
     except:
         convex_client = None
 
