@@ -6,21 +6,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-        
+
       - name: Install dependencies
         run: npm install
         working-directory: ./convex
-        
-      - name: Generate Convex files # ADD THIS STEP
+
+      - name: Generate Convex files
         run: npx convex codegen
         working-directory: ./convex
-        
+
       - name: Deploy to Convex
         run: npm run deploy
         working-directory: ./convex
