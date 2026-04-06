@@ -1,3 +1,14 @@
-"scripts": {
-  "deploy": "convex deploy" 
+{
+  "name": "convex-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy --bundle"
+  },
+  "dependencies": {
+    "convex": "^1.11.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
 }
