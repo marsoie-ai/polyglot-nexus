@@ -63,10 +63,24 @@ def save_lesson_to_db(topic, level, content):
 def create_pdf_bytes(raw_text):
     reshaped_text = reshape(raw_text)
     bidi_text = get_display(reshaped_text)
-    sections = bidi_text.split("###")
-    formatted_html = "".join([f'<div class="section">{" ".join(s.split())}</div>' for s in sections if s.strip()])
     
-    style = """<style>@page { size: A4; margin: 1.5cm; } body { font-family: sans-serif; font-size: 12pt; }</style>"""
+    # Splitting by language headers to create clean page breaks
+    sections = bidi_text.split("###")
+    
+    # Adding inline CSS for page breaks and better spacing
+    formatted_html = ""
+    for s in sections:
+        if s.strip():
+            formatted_html += f'<div style="page-break-after:always; margin-bottom: 20px;">'
+            formatted_html += f'{" ".join(s.split())}</div>'
+    
+    style = """
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: sans-serif; font-size: 11pt; line-height: 1.5; }
+        .section { margin-bottom: 15px; }
+    </style>
+    """
     html_template = f"<html><head>{style}</head><body>{formatted_html}</body></html>"
     result = io.BytesIO()
     pisa.CreatePDF(io.BytesIO(html_template.encode("UTF-8")), dest=result)
