@@ -61,26 +61,40 @@ def save_lesson_to_db(topic, level, content):
 
 # --- PDF GENERATION ---
 def create_pdf_bytes(raw_text):
+    # 1. Prepare Text
     reshaped_text = reshape(raw_text)
     bidi_text = get_display(reshaped_text)
-    
-    # Splitting by language headers to create clean page breaks
     sections = bidi_text.split("###")
     
-    # Adding inline CSS for page breaks and better spacing
+    # 2. Build HTML with Page Breaks
     formatted_html = ""
     for s in sections:
         if s.strip():
-            formatted_html += f'<div style="page-break-after:always; margin-bottom: 20px;">'
-            formatted_html += f'{" ".join(s.split())}</div>'
+            # 'page-break-after' ensures each language starts on a new page
+            formatted_html += f'<div style="page-break-after:always; margin-top: 20px;">'
+            formatted_html += f'{s.strip()}</div>'
     
+    # 3. The "Magic" Font CSS
+    # This tells the PDF to look for the files you have in your GitHub/HuggingFace folder
     style = """
     <style>
+        @font-face {
+            font-family: 'ArabicFont';
+            src: url('NotoSansArabic-Regular.ttf');
+        }
+        @font-face {
+            font-family: 'MalteseFont';
+            src: url('NotoSansMaltese-Regular.ttf');
+        }
         @page { size: A4; margin: 2cm; }
-        body { font-family: sans-serif; font-size: 11pt; line-height: 1.5; }
-        .section { margin-bottom: 15px; }
+        body { 
+            font-family: 'ArabicFont', 'MalteseFont', sans-serif; 
+            font-size: 11pt; 
+            line-height: 1.6; 
+        }
     </style>
     """
+    
     html_template = f"<html><head>{style}</head><body>{formatted_html}</body></html>"
     result = io.BytesIO()
     pisa.CreatePDF(io.BytesIO(html_template.encode("UTF-8")), dest=result)
